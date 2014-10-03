@@ -1,4 +1,4 @@
-/* code blinks the onboard led on PB1
+/* code blinks the onboard led on PB1 */
 
 #include "main.h"
 
