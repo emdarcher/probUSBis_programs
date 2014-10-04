@@ -4,12 +4,12 @@
 ;* A P P L I C A T I O N   N O T E   F O R   T H E   A V R   F A M I L Y
 ;* 
 ;* Number            : AVR000
-;* File Name         : "tn45def.inc"
-;* Title             : Register/Bit Definitions for the ATtiny45
+;* File Name         : "tn85def.inc"
+;* Title             : Register/Bit Definitions for the ATtiny85
 ;* Date              : 2005-01-11
 ;* Version           : 2.14
 ;* Support E-mail    : avr@atmel.com
-;* Target MCU        : ATtiny45
+;* Target MCU        : ATtiny85
 ;* 
 ;* DESCRIPTION
 ;* When including this file in the assembly program file, all I/O register 
@@ -37,21 +37,21 @@
 ;* ...                         ;otherwise do something else
 ;*************************************************************************
 
-#ifndef _TN45DEF_INC_
-#define _TN45DEF_INC_
+;ifndef _TN85DEF_INC_
+;define _TN85DEF_INC_
 
 
-#pragma partinc 0
+;pragma partinc 0
 
 ; ***** SPECIFY DEVICE ***************************************************
-.device ATtiny45
-#pragma AVRPART ADMIN PART_NAME ATtiny45
+.device ATtiny85
+;pragma AVRPART ADMIN PART_NAME ATtiny85
 .equ	SIGNATURE_000	= 0x1e
-.equ	SIGNATURE_001	= 0x92
-.equ	SIGNATURE_002	= 0x06
+.equ	SIGNATURE_001	= 0x93
+.equ	SIGNATURE_002	= 0x0B
 
-#pragma AVRPART CORE CORE_VERSION V2
-#pragma AVRPART CORE NEW_INSTRUCTIONS lpm rd,z+
+;pragma AVRPART CORE CORE_VERSION V2
+;pragma AVRPART CORE NEW_INSTRUCTIONS lpm rd,z+
 
 
 ; ***** I/O REGISTER DEFINITIONS *****************************************
@@ -634,25 +634,25 @@
 
 
 ; ***** DATA MEMORY DECLARATIONS *****************************************
-.equ	FLASHEND	= 0x07ff	; Note: Word address
+.equ	FLASHEND	= 0x0fff	; Note: Word address
 .equ	IOEND	= 0x003f
 .equ	SRAM_START	= 0x0060
-.equ	SRAM_SIZE	= 256
-.equ	RAMEND	= 0x015f
+.equ	SRAM_SIZE	= 512
+.equ	RAMEND	= 0x025f
 .equ	XRAMEND	= 0x0000
-.equ	E2END	= 0x00ff
-.equ	EEPROMEND	= 0x00ff
+.equ	E2END	= 0x01ff
+.equ	EEPROMEND	= 0x01ff
 .equ	EEADRBITS	= 8
-#pragma AVRPART MEMORY PROG_FLASH 4096
-#pragma AVRPART MEMORY EEPROM 256
-#pragma AVRPART MEMORY INT_SRAM SIZE 256
-#pragma AVRPART MEMORY INT_SRAM START_ADDR 0x60
+;pragma AVRPART MEMORY PROG_FLASH 8192
+;pragma AVRPART MEMORY EEPROM 512
+;pragma AVRPART MEMORY INT_SRAM SIZE 512
+;pragma AVRPART MEMORY INT_SRAM START_ADDR 0x60
 
 
 
 ; ***** BOOTLOADER DECLARATIONS ******************************************
 .equ	NRWW_START_ADDR	= 0x0
-.equ	NRWW_STOP_ADDR	= 0x7ff
+.equ	NRWW_STOP_ADDR	= 0xfff
 .equ	RWW_START_ADDR	= 0x0
 .equ	RWW_STOP_ADDR	= 0x0
 .equ	PAGESIZE	= 32
@@ -677,6 +677,6 @@
 
 .equ	INT_VECTORS_SIZE	= 15	; size in words
 
-#endif  /* _TN45DEF_INC_ */
+;endif  /* _TN45DEF_INC_ */
 
 ; ***** END OF FILE ******************************************************
