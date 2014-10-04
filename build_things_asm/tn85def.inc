@@ -1,3 +1,5 @@
+;original tn45def.inc was found in /usr/share/avra
+
 ;***** THIS IS A MACHINE GENERATED FILE - DO NOT EDIT ********************
 ;***** Created: 2005-01-11 10:31 ******* Source: ATtiny45.xml ************
 ;*************************************************************************
