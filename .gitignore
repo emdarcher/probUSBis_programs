@@ -7,3 +7,5 @@
 *.lst
 *.ihex
 *.swp
+*.obj
+*.cof
