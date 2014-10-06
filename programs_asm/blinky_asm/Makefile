@@ -12,4 +12,4 @@ upload:
 	$(MICRONUCLEUS) $(TARGET).hex
 
 clean:
-	rm *.hex *.obj *.eep *.cof
+	rm *.hex *.obj *.cof

@@ -10,8 +10,6 @@
 
 ;.db things
 
-
-
 .org 0000
 	rjmp RESET;
 
@@ -27,6 +25,14 @@ RESET:
 	out TCCR0B, regA;
 	ldi regA, (1<<TOIE0);
 	out TIMSK, regA;
+	
+	;set clock prescaler to div 16
+	;sbi CLKPR,CLKPCE;
+	ldi regA, (1<<CLKPCE);
+	out CLKPR, regA;
+	ldi regA, (1<<CLKPS2);
+	out CLKPR, regA;
+
 	sei;
 	rjmp MAIN; ;jump to main
 
@@ -34,9 +40,9 @@ MAIN:
 	;do stuff
 	
 	nop;
-	rjmp MAIN;
+	rjmp MAIN; loop back again.
 ;things
 
 TIM_OVF0:
-	sbi PINB, PB1;
-	reti;
+	sbi PINB, PB1; toggles PB1 on newer AVRs
+	reti;return from interrupt
