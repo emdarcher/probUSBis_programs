@@ -33,14 +33,14 @@ void main(void){
 static inline void set_clk_div16(void){
 /* sets the cpu clk to be the system clk/16 */
     CLKPR = (1<<CLKPCE); //set CLK prescaler enable bit
-    CLKPR |= (1<<CLKPS2); // set the prescaler to clk/16
+    CLKPR = (1<<CLKPS2); // set the prescaler to clk/16
 }
 
 static inline void init_tim0(void){
 /* stuff to initialize timer0 for things */
     TCCR0A |= (1<<WGM01)|(1<<WGM00); //set to fast PWM mode
     TCCR0A |= (1<<COM0B1); //set clear on compare match for OC0B
-    TCCR0B |= (1<<CS02)|(1<<CS00); //set to clk/1024 prescaler 
+    TCCR0B |= (1<<CS01)|(1<<CS00); //set to clk/64 prescaler 
     TIMSK |= (1<<TOIE0); //enable timer0 overflow interrupt
 }
 
