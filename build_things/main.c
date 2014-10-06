@@ -4,6 +4,8 @@
 
 /* defines */
 
+/* global variables */
+
 /* function prototypes */
 
 void main(void){
