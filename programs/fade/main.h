@@ -2,6 +2,9 @@
  * main.h header file with various avr includes & defines for the main code
  */
 
+#ifndef MAIN_H
+#define MAIN_H
+
 // Standard AVR includes
 #include <avr/io.h>
 #include <util/delay.h>
@@ -15,3 +18,6 @@
 //defines
 
 
+
+
+#endif
