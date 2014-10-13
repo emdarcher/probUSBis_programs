@@ -1,0 +1,12 @@
+attiny85:
+
+sleeping
+#import <avr/sleep.h>
+/*set to power down mode*/
+MCUCR |= (1<<SM1);
+/*set the sleep enable bit*/
+MCUCR |= (1<<SE);
+/*enable global interrupts*/
+sei();
+/*go too sleep*/
+sleep_cpu();
