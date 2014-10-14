@@ -56,6 +56,8 @@ static inline void init_tim0(void){
 static inline void init_RGB_stuff(void){
 /* stuff to initialize the pins and stuff for the RGB LED */
     RGB_DDRx |= (1<<R_PORT_BIT)|(1<<G_PORT_BIT)|(1<<B_PORT_BIT);
+    /* set red to be on first ? */
+    RGB_PORTx |= (1<<R_PORT_BIT);
 }
 
 /* Interrupt Service Routines */
