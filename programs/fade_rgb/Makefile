@@ -15,7 +15,7 @@ LOCAL_SOURCE =
 # EXTRA_SOURCE_DIR = ../AVR-Programming-Library/
 # EXTRA_SOURCE_FILES = USART.c
 EXTRA_SOURCE_DIR = ./libs/
-EXTRA_SOURCE_FILES =
+EXTRA_SOURCE_FILES = probUSBis.c
 
 ## Defined programs / locations
 CC = avr-gcc
