@@ -4,13 +4,16 @@
 
 /* defines */
 
-//#define PWM_OCR0B_DIR_BIT 0 
-
 #define RGB_DDRx    DDRB
 #define RGB_PORTx   PORTB
 #define R_PORT_BIT  0 
 #define G_PORT_BIT  1
 #define B_PORT_BIT  2
+
+#define R_FLAG 0
+#define G_FLAG 1
+#define B_FLAG 2
+#define PWM_DIR_FLAG 3
 
 /* function prototypes */
 static inline void init_tim0(void);
@@ -19,14 +22,16 @@ static inline void init_RGB_stuff(void);
 
 
 /*globals*/
-volatile uint8_t pwm_fade_OCR0B=0xFF;
+volatile uint8_t pwm_fade=0xFF;
 volatile uint8_t my_flags;
+volatile uint8_t pwm_store;
 
 void main(void){
 
     /* init stuff */
     set_clk_div16();
-    DDRB |= (1<<PB1);
+//    DDRB |= (1<<PB1);
+    init_RGB_stuff();
     init_tim0();
 
     sei();/* enable interrupts */     
@@ -67,13 +72,17 @@ ISR(TIM0_OVF_vect){
     
     /* decrement the pwm value, this will go until zero, 
     then jump to 255, then keep decrementing */
-    --pwm_fade_OCR0B; 
+    --pwm_fade; 
     /* if the PWM direction flag is set, then output 255-pwm_value, else output pwm_value */
-    OCR0B = (bit_is_set(my_flags, PWM_OCR0B_DIR_BIT)) ? (255-pwm_fade_OCR0B) : pwm_fade_OCR0B; 
+    pwm_store = (bit_is_set(my_flags, PWM_OCR0B_DIR_BIT)) ? (255-pwm_fade_OCR0B) : pwm_fade_OCR0B; 
     /* if the pwm_value has reached zero, then toggle the pwm direction flag */
-    if(!pwm_fade_OCR0B){
-        my_flags ^= (1<<PWM_OCR0B_DIR_BIT);
+    if(!pwm_fade){
+        my_flags ^= (1<<PWM_DIR_FLAG);
     } 
 }
 
-
+ISR(TIM0_COMPB_vect){
+/* Timer0 compare match B interrupt service routine */
+    
+    
+}
