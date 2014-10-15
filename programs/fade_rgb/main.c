@@ -45,8 +45,12 @@ void main(void){
 
 static inline void set_clk_div16(void){
 /* sets the cpu clk to be the system clk/16 */
+    #if !defined(_AVR_POWER_H_)
     CLKPR = (1<<CLKPCE); //set CLK prescaler enable bit
     CLKPR = (1<<CLKPS2); // set the prescaler to clk/16
+    #else
+    clock_prescale_set(clock_div_16);
+    #endif
 }
 
 static inline void init_tim0(void){
