@@ -98,8 +98,8 @@ ISR(TIM0_OVF_vect){
         --pwm_fade; 
     
         /*if the PWM direction flag is set, then output 255-pwm_value, else output pwm_value*/
-        //pwm_store = (bit_is_set(my_flags, PWM_DIR_FLAG)) ? (255-pwm_fade) : pwm_fade; 
-        pwm_store = pwm_fade;
+        pwm_store = (bit_is_set(my_flags, PWM_DIR_FLAG)) ? (255-pwm_fade) : pwm_fade; 
+        //pwm_store = pwm_fade;
         /* if the pwm_value has reached zero, then toggle the pwm direction flag */
         if(!pwm_fade){
             my_flags ^= (1<<PWM_DIR_FLAG);
