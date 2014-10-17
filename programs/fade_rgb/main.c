@@ -126,6 +126,7 @@ ISR(TIM0_OVF_vect){
                 //my_flags = ((my_flags & RGB_FLAG_MASK)<<1) | (my_flags & ~RGB_FLAG_MASK);
                 my_flags &= (1<<R_FLAG);
                 my_flags |= (1<<G_FLAG);
+                rgb_toggle_store &= (1<<B_PORT_BIT);
                 rgb_toggle_store |= (1<<G_PORT_BIT);
                 RGB_PORTx &= (1<<R_PORT_BIT);
                 RGB_PORTx |= (1<<G_PORT_BIT);
