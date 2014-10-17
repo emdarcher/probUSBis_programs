@@ -65,7 +65,7 @@ static inline void set_clk_div16(void){
 #endif
 static inline void init_tim0(void){
 /* stuff to initialize timer0 for things */
-//    TCCR0A |= (1<<WGM01)|(1<<WGM00); //set to fast PWM mode
+    TCCR0A |= (1<<WGM01)|(1<<WGM00); //set to fast PWM mode
 //    TCCR0A |= (1<<COM0B1); //set clear on compare match for OC0B
    // TCCR0B |= (1<<CS01)|(1<<CS00); //set to clk/64 prescaler 
     TCCR0B |= (1<<CS02); //set to clk/256 prescaler
@@ -87,11 +87,12 @@ static inline void init_RGB_stuff(void){
 
 ISR(TIM0_OVF_vect){
 /* Timer0 overflow interrupt service routine */
+    RGB_PORTx ^= rgb_toggle_store;
 
-    --ovf0_cnt;
+//    --ovf0_cnt;
     
-    if(!ovf0_cnt){ 
-        ovf0_cnt = OVF0_CNT_TOP;   
+//    if(!ovf0_cnt){ 
+//        ovf0_cnt = OVF0_CNT_TOP;   
    
         /* decrement the pwm value, this will go until zero, 
         then jump to 255, then keep decrementing */
@@ -102,6 +103,9 @@ ISR(TIM0_OVF_vect){
         pwm_store = pwm_fade;
         /* if the pwm_value has reached zero, then toggle the pwm direction flag */
         if(!pwm_fade){
+
+            pwm_store++;            
+
             my_flags ^= (1<<PWM_DIR_FLAG);
             //rotate selected color
             #if 0 
@@ -119,31 +123,41 @@ ISR(TIM0_OVF_vect){
             #endif
             
             if(bit_is_set(my_flags,R_FLAG)){
-                my_flags = ((my_flags & RGB_FLAG_MASK)<<1) | (my_flags & ~RGB_FLAG_MASK);
+                //my_flags = ((my_flags & RGB_FLAG_MASK)<<1) | (my_flags & ~RGB_FLAG_MASK);
+                my_flags &= (1<<R_FLAG);
+                my_flags |= (1<<G_FLAG);
                 rgb_toggle_store |= (1<<G_PORT_BIT);
-                PORTB &= (1<<R_PORT_BIT);
-                PORTB |= (1<<G_PORT_BIT);
+                RGB_PORTx &= (1<<R_PORT_BIT);
+                RGB_PORTx |= (1<<G_PORT_BIT);
             } else if(bit_is_set(my_flags,G_FLAG)){
-                my_flags = ((my_flags & RGB_FLAG_MASK)<<1) | (my_flags & ~RGB_FLAG_MASK);
+                //my_flags = ((my_flags & RGB_FLAG_MASK)<<1) | (my_flags & ~RGB_FLAG_MASK);
+                my_flags &= (1<<G_FLAG);
+                my_flags |= (1<<B_FLAG);
                 rgb_toggle_store &= (1<<R_PORT_BIT);
                 rgb_toggle_store |= (1<<B_PORT_BIT);
-                PORTB &= (1<<G_PORT_BIT);
-                PORTB |= (1<<B_PORT_BIT);
+                RGB_PORTx &= (1<<G_PORT_BIT);
+                RGB_PORTx |= (1<<B_PORT_BIT);
             } else if(bit_is_set(my_flags,B_FLAG)){
                 my_flags &= ~(1<<B_FLAG);
                 my_flags |= (1<<R_FLAG);
                 rgb_toggle_store &= (1<<G_PORT_BIT);
                 rgb_toggle_store |= (1<<R_PORT_BIT);
-                PORTB &= (1<<B_PORT_BIT);
-                PORTB |= (1<<R_PORT_BIT);
+                RGB_PORTx &= (1<<B_PORT_BIT);
+                RGB_PORTx |= (1<<R_PORT_BIT);
             }
-            
-        } 
-    }
+            //OCR0B = 255-pwm_store;   
+            //OCR0B = pwm_store;
+        }
+      //OCR0B = 255-pwm_store;
+        OCR0B = pwm_store;
+//    }
+    //TIFR |= (1<<OCF0B);  //clear the pending interrupt
+    RGB_PORTx ^= rgb_toggle_store;
+
 }
 
 ISR(TIM0_COMPB_vect){
 /* Timer0 compare match B interrupt service routine */
     
-        PORTB ^= rgb_toggle_store;
+        RGB_PORTx ^= rgb_toggle_store;
 }
