@@ -88,10 +88,10 @@ static inline void init_RGB_stuff(void){
 ISR(TIM0_OVF_vect){
 /* Timer0 overflow interrupt service routine */
 
-    --ovf0_cnt;
+//    --ovf0_cnt;
     
-    if(!ovf0_cnt){ 
-        ovf0_cnt = OVF0_CNT_TOP;   
+//    if(!ovf0_cnt){ 
+//        ovf0_cnt = OVF0_CNT_TOP;   
    
         /* decrement the pwm value, this will go until zero, 
         then jump to 255, then keep decrementing */
@@ -116,7 +116,7 @@ ISR(TIM0_OVF_vect){
             }            
             PORTB = ((my_flags & RGB_FLAG_MASK)>>R_FLAG) | (PORTB & ~RGB_PORT_MASK);
         } 
-    }
+ //   }
 }
 
 ISR(TIM0_COMPB_vect){
