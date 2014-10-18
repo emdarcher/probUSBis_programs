@@ -90,7 +90,7 @@ static inline void init_RGB_stuff(void){
 
 ISR(TIM0_OVF_vect){
 /* Timer0 overflow interrupt service routine */
-    //RGB_PORTx ^= rgb_toggle_store;
+//    RGB_PORTx ^= rgb_toggle_store;
 
     //--ovf0_cnt;
     
@@ -111,57 +111,44 @@ ISR(TIM0_OVF_vect){
 
             my_flags ^= (1<<PWM_DIR_FLAG);
             //rotate selected color
-            #if 0 
-            if(bit_is_set(my_flags, B_FLAG)){
-                my_flags &= ~(1<<B_FLAG);
-                my_flags |= (1<<R_FLAG);
-                rgb_toggle_store = (1<<R_PORT_BIT)|(1<<B_PORT_BIT); 
-            } else {
-                rgb_toggle_store = (bit_is_set(my_flags,R_FLAG)) ? 
-                                        (rgb_toggle_store | (1<<G_PORT_BIT)): 
-                                        (rgb_toggle_store << 1);
-                my_flags = ((my_flags & RGB_FLAG_MASK)<<1) | (my_flags & ~RGB_FLAG_MASK);  
-            }            
-            PORTB = ((my_flags & RGB_FLAG_MASK)>>R_FLAG) | (PORTB & ~RGB_PORT_MASK);
-            #endif
-            uint8_t flag_temp = my_flags;
-            uint8_t tglstr_temp = rgb_toggle_store;
+            uint8_t flag_temp   =   my_flags;
+            uint8_t tglstr_temp =   rgb_toggle_store;
             if(bit_is_set(my_flags,R_FLAG)){
-                //my_flags = ((my_flags & RGB_FLAG_MASK)<<1) | (my_flags & ~RGB_FLAG_MASK);
-                flag_temp &= ~(1<<R_FLAG);
-                flag_temp |= (1<<G_FLAG);
-                tglstr_temp &= ~(1<<B_PORT_BIT);
-                tglstr_temp |= (1<<G_PORT_BIT);
-                RGB_PORTx &= ~(1<<R_PORT_BIT);
-                RGB_PORTx |= (1<<G_PORT_BIT);
+                flag_temp &=    ~(1<<R_FLAG);
+                flag_temp |=    (1<<G_FLAG);
+                tglstr_temp &=  ~(1<<B_PORT_BIT);
+                tglstr_temp |=  (1<<G_PORT_BIT);
+                RGB_PORTx &=    ~(1<<R_PORT_BIT);
+                RGB_PORTx |=    (1<<G_PORT_BIT);
             } else if(bit_is_set(my_flags,G_FLAG)){
-                //my_flags = ((my_flags & RGB_FLAG_MASK)<<1) | (my_flags & ~RGB_FLAG_MASK);
-                flag_temp &= ~(1<<G_FLAG);
-                flag_temp |= (1<<B_FLAG);
-                tglstr_temp &= ~(1<<R_PORT_BIT);
-                tglstr_temp |= (1<<B_PORT_BIT);
-                RGB_PORTx &= ~(1<<G_PORT_BIT);
-                RGB_PORTx |= (1<<B_PORT_BIT);
+                flag_temp &=    ~(1<<G_FLAG);
+                flag_temp |=    (1<<B_FLAG);
+                tglstr_temp &=  ~(1<<R_PORT_BIT);
+                tglstr_temp |=  (1<<B_PORT_BIT);
+                RGB_PORTx &=    ~(1<<G_PORT_BIT);
+                RGB_PORTx |=    (1<<B_PORT_BIT);
             } else if(bit_is_set(my_flags,B_FLAG)){
-                flag_temp &= ~(1<<B_FLAG);
-                flag_temp |= (1<<R_FLAG);
-                tglstr_temp &= ~(1<<G_PORT_BIT);
-                tglstr_temp |= (1<<R_PORT_BIT);
-                RGB_PORTx &= ~(1<<B_PORT_BIT);
-                RGB_PORTx |= (1<<R_PORT_BIT);
+                flag_temp &=    ~(1<<B_FLAG);
+                flag_temp |=    (1<<R_FLAG);
+                tglstr_temp &=  ~(1<<G_PORT_BIT);
+                tglstr_temp |=  (1<<R_PORT_BIT);
+                RGB_PORTx &=    ~(1<<B_PORT_BIT);
+                RGB_PORTx |=    (1<<R_PORT_BIT);
             }
             rgb_toggle_store = tglstr_temp;
             my_flags = flag_temp;
             //OCR0B = 255-pwm_store;   
             //OCR0B = pwm_store;
         }
+        //#define RGB_LED_TYPE 1
         #if RGB_LED_TYPE==1
-      OCR0B = 255-pwm_store;
-       #elif RGB_LED_TYPE==0
+        OCR0B = 255-pwm_store;
+         #elif RGB_LED_TYPE==0
         OCR0B = pwm_store;
         #endif
     //}
     //TIFR |= (1<<OCF0B);  //clear the pending interrupt
+    
     RGB_PORTx ^= rgb_toggle_store;
 
 }
