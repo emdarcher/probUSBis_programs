@@ -90,7 +90,7 @@ static inline void init_RGB_stuff(void){
 
 ISR(TIM0_OVF_vect){
 /* Timer0 overflow interrupt service routine */
-    RGB_PORTx ^= rgb_toggle_store;
+    //RGB_PORTx ^= rgb_toggle_store;
 
     //--ovf0_cnt;
     
@@ -107,7 +107,7 @@ ISR(TIM0_OVF_vect){
         /* if the pwm_value has reached zero, then toggle the pwm direction flag */
         if(!pwm_fade){
 
-            pwm_store++;            
+            //pwm_store++;            
 
             my_flags ^= (1<<PWM_DIR_FLAG);
             //rotate selected color
@@ -155,14 +155,14 @@ ISR(TIM0_OVF_vect){
             //OCR0B = 255-pwm_store;   
             //OCR0B = pwm_store;
         }
-        #if RGB_LED_TYPE=1
+        #if RGB_LED_TYPE==1
       OCR0B = 255-pwm_store;
-       #elif RGB_LED_TYPE=0
+       #elif RGB_LED_TYPE==0
         OCR0B = pwm_store;
         #endif
     //}
     //TIFR |= (1<<OCF0B);  //clear the pending interrupt
-    //RGB_PORTx ^= rgb_toggle_store;
+    RGB_PORTx ^= rgb_toggle_store;
 
 }
 
