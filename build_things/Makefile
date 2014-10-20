@@ -13,7 +13,7 @@ LOCAL_SOURCE =
 
 ## Here you can link to one more directory (and multiple .c files)
 EXTRA_SOURCE_DIR = ./libs/
-EXTRA_SOURCE_FILES =
+EXTRA_SOURCE_FILES = probUSBis.c
 
 ## Defined programs / locations
 CC = avr-gcc
@@ -26,6 +26,7 @@ MICRONUCLEUS = micronucleus
 
 ## Compilation options, type man avr-gcc if you're curious.
 CFLAGS = -mmcu=$(MCU) -DF_CPU=$(F_CPU)UL -DBAUD=$(BAUD) -Os -I. -I$(EXTRA_SOURCE_DIR)
+CFLAGS += --combine -fwhole-program
 CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums 
 CFLAGS += -Wall -Wstrict-prototypes
 CFLAGS += -g -ggdb

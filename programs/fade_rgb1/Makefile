@@ -12,8 +12,6 @@ MAIN = main.c
 LOCAL_SOURCE = 
 
 ## Here you can link to one more directory (and multiple .c files)
-# EXTRA_SOURCE_DIR = ../AVR-Programming-Library/
-# EXTRA_SOURCE_FILES = USART.c
 EXTRA_SOURCE_DIR = ./libs/
 EXTRA_SOURCE_FILES = probUSBis.c
 
@@ -28,7 +26,7 @@ MICRONUCLEUS = micronucleus
 
 ## Compilation options, type man avr-gcc if you're curious.
 CFLAGS = -mmcu=$(MCU) -DF_CPU=$(F_CPU)UL -DBAUD=$(BAUD) -Os -I. -I$(EXTRA_SOURCE_DIR)
-#CFLAGS += $(UART_LIB_FLAGS)
+CFLAGS += --combine -fwhole-program
 CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums 
 CFLAGS += -Wall -Wstrict-prototypes
 CFLAGS += -g -ggdb
