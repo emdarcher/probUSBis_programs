@@ -12,8 +12,6 @@
 #define G_PORT_BIT  1
 #define B_PORT_BIT  2
 #define RGB_PORT_MASK ((1<<R_PORT_BIT)|(1<<G_PORT_BIT)|(1<<B_PORT_BIT))
-//#define USE_RGB_PINx_TOGGLE 1
-
 
 #define R_FLAG 0
 #define G_FLAG 1
@@ -28,7 +26,6 @@
 
 /* function prototypes */
 static inline void init_tim0(void);
-//static inline void set_clk_div16(void);
 static inline void init_RGB_stuff(void);
 
 
@@ -58,17 +55,7 @@ void main(void){
 }
 
 /* function bodies */
-#if !defined(PROBUSBIS_H) 
-static inline void set_clk_div16(void){
-/* sets the cpu clk to be the system clk/16 */
-    #if !defined(_AVR_POWER_H_)
-    CLKPR = (1<<CLKPCE); //set CLK prescaler enable bit
-    CLKPR = (1<<CLKPS2); // set the prescaler to clk/16
-    #else
-    clock_prescale_set(clock_div_16);
-    #endif
-}
-#endif
+
 static inline void init_tim0(void){
 /* stuff to initialize timer0 for things */
 //    TCCR0A |= (1<<WGM01)|(1<<WGM00); //set to fast PWM mode
@@ -148,14 +135,10 @@ ISR(TIM0_OVF_vect){
                 rgbport_temp &=    ~(1<<B_PORT_BIT);
                 rgbport_temp |=    (1<<R_PORT_BIT);
             }
+            
             my_flags = flag_temp;
-            rgb_toggle_store = tglstr_temp;
             RGB_PORTx = rgbport_temp;
-            //RGB_PORTx ^= rgb_toggle_store;
-            //TIFR |= (1<<OCF0B);  //clear the pending interrupt
-            /*if(bit_is_clear(my_flags, PWM_DIR_FLAG)){
-                RGB_PORTx ^= rgb_toggle_store;
-            }*/
+            rgb_toggle_store = tglstr_temp;
         }
         //#define RGB_LED_TYPE 1
        //if(bit_is_set(my_flags, PWM_DIR_FLAG)){
@@ -177,7 +160,6 @@ ISR(TIM0_OVF_vect){
     //TIFR |= (1<<OCF0B);  //clear the pending interrupt
     
     //RGB_PORTx ^= rgb_toggle_store;
-    //RGB_PINx |= rgb_toggle_store;
 
 }
 
