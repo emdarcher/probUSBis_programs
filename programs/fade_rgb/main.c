@@ -12,6 +12,8 @@
 #define G_PORT_BIT  1
 #define B_PORT_BIT  2
 #define RGB_PORT_MASK ((1<<R_PORT_BIT)|(1<<G_PORT_BIT)|(1<<B_PORT_BIT))
+#define USE_RGB_PINx_TOGGLE 0
+
 
 #define R_FLAG 0
 #define G_FLAG 1
@@ -94,7 +96,12 @@ static inline void init_RGB_stuff(void){
 
 ISR(TIM0_OVF_vect){
 /* Timer0 overflow interrupt service routine */
-    //RGB_PORTx ^= rgb_toggle_store;
+    
+    #if !USE_RGB_PINx_TOGGLE
+    RGB_PORTx ^= rgb_toggle_store;
+    #else
+    RGB_PINx |= rgb_toggle_store;
+    #endif    
 
     //--ovf0_cnt;
     
@@ -111,10 +118,18 @@ ISR(TIM0_OVF_vect){
         /* if the pwm_value has reached zero, then toggle the pwm direction flag */
         if(!pwm_fade){
 
-            //pwm_store++;            
+           pwm_store++;            
 
             my_flags ^= (1<<PWM_DIR_FLAG);
+            
 
+            //RGB_PORTx ^= rgb_toggle_store;
+            #if !USE_RGB_PINx_TOGGLE
+            RGB_PORTx ^= rgb_toggle_store;
+            #else
+            RGB_PINx |= rgb_toggle_store;
+            #endif
+    
             //RGB_PORTx &= ~RGB_PORT_MASK;
 
             //rotate selected color
@@ -146,8 +161,8 @@ ISR(TIM0_OVF_vect){
             rgb_toggle_store = tglstr_temp;
             my_flags = flag_temp;
             RGB_PORTx = rgbport_temp;
-            //OCR0B = 255-pwm_store;   
-            //OCR0B = pwm_store;
+            //RGB_PORTx ^= rgb_toggle_store;
+            //TIFR |= (1<<OCF0B);  //clear the pending interrupt
         }
         //#define RGB_LED_TYPE 1
         #if RGB_LED_TYPE==1
@@ -158,7 +173,7 @@ ISR(TIM0_OVF_vect){
     //}
     //TIFR |= (1<<OCF0B);  //clear the pending interrupt
     
-    RGB_PORTx ^= rgb_toggle_store;
+    //RGB_PORTx ^= rgb_toggle_store;
     //RGB_PINx |= rgb_toggle_store;
 
 }
@@ -166,6 +181,12 @@ ISR(TIM0_OVF_vect){
 ISR(TIM0_COMPB_vect){
 /* Timer0 compare match B interrupt service routine */
     
-        RGB_PORTx ^= rgb_toggle_store;
+        //RGB_PORTx ^= rgb_toggle_store;
         //RGB_PINx |= rgb_toggle_store;
+
+    #if !USE_RGB_PINx_TOGGLE
+    RGB_PORTx ^= rgb_toggle_store;
+    #else
+    RGB_PINx |= rgb_toggle_store;
+    #endif
 }
