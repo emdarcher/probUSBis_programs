@@ -9,7 +9,7 @@
 #define RGB_PORTx   PORTB
 #define RGB_PINx    PINB
 #define R_PORT_BIT  0 
-#define G_PORT_BIT  1
+#define G_PORT_BIT  5
 #define B_PORT_BIT  2
 #define RGB_PORT_MASK ((1<<R_PORT_BIT)|(1<<G_PORT_BIT)|(1<<B_PORT_BIT))
 //#define USE_RGB_PINx_TOGGLE 1
@@ -49,11 +49,11 @@ void main(void){
 //    DDRB |= (1<<PB1);
     init_RGB_stuff();
     init_tim0();
-
+    set_sleep_mode(SLEEP_MODE_IDLE);
     sei();/* enable interrupts */     
     /* infinite loop */
     while(1){
-       //do nothin' 
+        sleep_mode();
     }
 }
 
