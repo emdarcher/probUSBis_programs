@@ -12,7 +12,7 @@
 #define G_PORT_BIT  1
 #define B_PORT_BIT  2
 #define RGB_PORT_MASK ((1<<R_PORT_BIT)|(1<<G_PORT_BIT)|(1<<B_PORT_BIT))
-#define USE_RGB_PINx_TOGGLE 0
+//#define USE_RGB_PINx_TOGGLE 1
 
 
 #define R_FLAG 0
@@ -42,10 +42,10 @@ volatile uint8_t rgb_toggle_store;
 void main(void){
 
     /* init stuff */
-    //set_clk_div16();
+    set_clk_div16();
     
     /* to divide 16.5MHz clk by 2*/
-    clock_prescale_set(clock_div_2);
+    //clock_prescale_set(clock_div_2);
 //    DDRB |= (1<<PB1);
     init_RGB_stuff();
     init_tim0();
@@ -73,8 +73,8 @@ static inline void init_tim0(void){
 /* stuff to initialize timer0 for things */
 //    TCCR0A |= (1<<WGM01)|(1<<WGM00); //set to fast PWM mode
 //    TCCR0A |= (1<<COM0B1); //set clear on compare match for OC0B
-   // TCCR0B |= (1<<CS01)|(1<<CS00); //set to clk/64 prescaler 
-    TCCR0B |= (1<<CS02); //set to clk/256 prescaler
+    TCCR0B |= (1<<CS01)|(1<<CS00); //set to clk/64 prescaler 
+   // TCCR0B |= (1<<CS02); //set to clk/256 prescaler
     TIMSK |= (1<<TOIE0); //enable timer0 overflow interrupt
     TIMSK |= (1<<OCIE0B); //enable timer0 compare match B interrupt
 }
@@ -97,12 +97,7 @@ static inline void init_RGB_stuff(void){
 ISR(TIM0_OVF_vect){
 /* Timer0 overflow interrupt service routine */
     
-    #if !USE_RGB_PINx_TOGGLE
     RGB_PORTx ^= rgb_toggle_store;
-    #else
-    RGB_PINx |= rgb_toggle_store;
-    #endif    
-
     //--ovf0_cnt;
     
     //if(!ovf0_cnt){ 
@@ -118,18 +113,12 @@ ISR(TIM0_OVF_vect){
         /* if the pwm_value has reached zero, then toggle the pwm direction flag */
         if(!pwm_fade){
 
-           pwm_store++;            
+            pwm_store++;            
 
             my_flags ^= (1<<PWM_DIR_FLAG);
             
 
-            //RGB_PORTx ^= rgb_toggle_store;
-            #if !USE_RGB_PINx_TOGGLE
             RGB_PORTx ^= rgb_toggle_store;
-            #else
-            RGB_PINx |= rgb_toggle_store;
-            #endif
-    
             //RGB_PORTx &= ~RGB_PORT_MASK;
 
             //rotate selected color
@@ -165,6 +154,7 @@ ISR(TIM0_OVF_vect){
             //TIFR |= (1<<OCF0B);  //clear the pending interrupt
         }
         //#define RGB_LED_TYPE 1
+        
         #if RGB_LED_TYPE==1
         OCR0B = 255-pwm_store;
         #elif RGB_LED_TYPE==0
@@ -181,12 +171,5 @@ ISR(TIM0_OVF_vect){
 ISR(TIM0_COMPB_vect){
 /* Timer0 compare match B interrupt service routine */
     
-        //RGB_PORTx ^= rgb_toggle_store;
-        //RGB_PINx |= rgb_toggle_store;
-
-    #if !USE_RGB_PINx_TOGGLE
-    RGB_PORTx ^= rgb_toggle_store;
-    #else
-    RGB_PINx |= rgb_toggle_store;
-    #endif
+        RGB_PORTx ^= rgb_toggle_store;
 }
