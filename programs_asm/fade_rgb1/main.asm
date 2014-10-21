@@ -5,7 +5,7 @@
 ;.def and .equ things
 
 .def regA = r16;
-;.def regB = r17;
+.def isr_toggle_reg = r17;
 .def temp_pwm_reg = r15;
 
 .def tgl_io_regA = r21;
@@ -16,7 +16,7 @@
 .def rgb_tgl_reg = r23;
 .def flag_temp = r24;
 .def tglstr_temp = r25;
-.def rgbport_temp = r17;
+.def rgbport_temp = r18;
 
 .equ PWM_DIR_BIT = 3;
 
@@ -77,20 +77,22 @@
 
 ;.db things
 
-.org 0000
+.org 0000	
 	rjmp RESET;
-.org OVF0addr
+.org OVF0addr	
 	rjmp TIM0_OVF;
-.org OC0Baddr
+.org OC0Baddr 	
 	rjmp TIM0_COMPB;
+
+
 RESET:
 	;stuff do do at reset
 	
 	;set clock prescaler to div 2
-	;ldi regA, (1<<CLKPCE);
-	;out CLKPR, regA;
-	;ldi regA, (1<<CLKPS0);
-	;out CLKPR, regA;
+	ldi regA, (1<<CLKPCE);
+	out CLKPR, regA;
+	ldi regA, (1<<CLKPS0);
+	out CLKPR, regA;
 
 	init_RGB_stuff; call the rgb init macro
 
@@ -98,7 +100,7 @@ RESET:
 	;ldi regA, (1<<CS01)|(1<<CS00); set to div/64
 	ldi regA, (1<<CS02); set to clk/256 prescaler
 	out TCCR0B, regA;put into TCCR0B
-	ldi regA, (1<<TOIE0)|(1<<OCIE0B);enable timer0 overflow interrupt
+	ldi regA, ((1<<TOIE0)|(1<<OCIE0B));enable timer0 overflow interrupt
 					;and compare match B interrupt
 	out TIMSK, regA;put into TIMSK
 	
@@ -111,11 +113,29 @@ MAIN:
 	rjmp MAIN; loop back again.
 ;things
 
+TIM0_COMPB:
+
+        ;tgl_io_in_reg RGB_PORTx, rgb_tgl_reg;toggle the pins 
+        in  isr_toggle_reg, RGB_PORTx;
+        ;eor isr_toggle_reg, rgb_tgl_reg;
+	eor rgb_tgl_reg, isr_toggle_reg;
+	;
+        ;out RGB_PORTx, isr_toggle_reg;
+        out RGB_PORTx, rgb_tgl_reg;
+        reti;return from interrupt
+
+
+
 TIM0_OVF:
 
-	tgl_io_in_reg RGB_PORTx, rgb_tgl_reg;toggle the pins	
+	;tgl_io_in_reg RGB_PORTx, rgb_tgl_reg;toggle the pins	
+	in  isr_toggle_reg, RGB_PORTx;
+        eor isr_toggle_reg, rgb_tgl_reg;
+        out RGB_PORTx, isr_toggle_reg;
+
 
 	dec pwm_fade_reg; dec the val
+	;subi	pwm_fade_reg,1;
 	mov temp_pwm_reg, pwm_fade_reg;copy to temp_pwm_reg
 	;sbrc my_flags_reg, PWM_DIR_BIT;skip if pwm dir flag is set
 	;	com temp_pwm_reg;do 1's complement, makes it 255-value.
@@ -126,11 +146,18 @@ TIM0_OVF:
 	
 	;these are executed if no branch occurs,
 	;so if pwm_fade_reg = 0, do these things.
-	ldi regA, (1<<PWM_DIR_FLAG);put the dir flag bit in regA
-	eor my_flags_reg, regA; toggle dir flag bit in my_flags_reg
+	;ldi regA, (1<<PWM_DIR_FLAG);put the dir flag bit in regA
+	;eor my_flags_reg, regA; toggle dir flag bit in my_flags_reg
 	
-	tgl_io_in_reg RGB_PORTx, rgb_tgl_reg;toggle the pins  
+	;inc temp_pwm_reg;
+	out OCR0B, temp_pwm_reg; put the value into OCR0B
 
+	;tgl_io_in_reg RGB_PORTx, rgb_tgl_reg;toggle the pins  
+	;in  isr_toggle_reg, RGB_PORTx;
+        ;eor isr_toggle_reg, rgb_tgl_reg;
+        ;out RGB_PORTx, isr_toggle_reg;
+
+	
 	;make temp storage
 	mov flag_temp, my_flags_reg;
 	mov tglstr_temp, rgb_tgl_reg;
@@ -168,7 +195,7 @@ B_FLAG_SET:
 	ori  tglstr_temp, (1<<R_PORT_BIT);
 	andi rgbport_temp, ~(1<<B_PORT_BIT);
 	ori  rgbport_temp, (1<<R_PORT_BIT);
-	
+		rjmp END_JUMP_TREE;	
 
 END_JUMP_TREE:
 	mov my_flags_reg, flag_temp;
@@ -176,15 +203,18 @@ END_JUMP_TREE:
 	mov rgb_tgl_reg, tglstr_temp;
 
 	;out OCR0B, temp_pwm_reg;	
-	out OCR0B, pwm_fade_reg;
+	;out OCR0B, pwm_fade_reg;
 
 
 PWM_NOT_0: ; the branch skips to here 
-	;nop; a nop to do something before returning
+	nop; a nop to do something before returning
 	reti;return from interrupt
 
-TIM0_COMPB:
+;TIM0_COMPB:
 	
-	tgl_io_in_reg RGB_PORTx, rgb_tgl_reg;toggle the pins 
-
-	reti;return from interrupt
+	;tgl_io_in_reg RGB_PORTx, rgb_tgl_reg;toggle the pins 
+;	in  isr_toggle_reg, RGB_PORTx;
+;	eor isr_toggle_reg, rgb_tgl_reg;
+;	out RGB_PORTx, isr_toggle_reg;
+	;out RGB_PINx, rgb_tgl_reg;
+;	reti;return from interrupt
