@@ -8,8 +8,8 @@ MICRONUCLEUS=micronucleus
 all:
 	$(AS) $(ASRC)
 
-upload:
+upload: all
 	$(MICRONUCLEUS) $(TARGET).hex
 
 clean:
-	rm *.hex *.obj *.eep *.cof
+	rm *.hex *.obj *.cof
