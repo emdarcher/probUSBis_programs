@@ -94,15 +94,29 @@ RESET:
 	ldi regA, (1<<CLKPS0);
 	out CLKPR, regA;
 
-	init_RGB_stuff; call the rgb init macro
+	;init_RGB_stuff; call the rgb init macro
+	
+	;set port bits to output
+        in tgl_io_regB, RGB_DDRx;
+        ori tgl_io_regB, RGB_PORT_MASK;
+        out RGB_DDRx, tgl_io_regB;
+        ;set red pin on first
+        sbi RGB_PORTx, R_PORT_BIT;
+        ;set R flag in my_flags_reg
+        ori my_flags_reg, (1<<R_FLAG);
+        ;set the bits in the toggle reg
+        ori rgb_tgl_reg, ((1<<R_PORT_BIT)|(1<<B_PORT_BIT));
+
 
 	;setup timer0 stuff
 	;ldi regA, (1<<CS01)|(1<<CS00); set to div/64
 	ldi regA, (1<<CS02); set to clk/256 prescaler
 	out TCCR0B, regA;put into TCCR0B
 	ldi regA, ((1<<TOIE0)|(1<<OCIE0B));enable timer0 overflow interrupt
-					;and compare match B interrupt
-	out TIMSK, regA;put into TIMSK
+						;and compare match B interrupt
+	in tgl_io_regB, TIMSK;
+	or tgl_io_regB, regA;
+	out TIMSK, tgl_io_regB;put into TIMSK
 	
 	sei; enable interrupts
 	rjmp MAIN; ;jump to main
@@ -129,9 +143,9 @@ TIM0_COMPB:
 TIM0_OVF:
 
 	;tgl_io_in_reg RGB_PORTx, rgb_tgl_reg;toggle the pins	
-	in  isr_toggle_reg, RGB_PORTx;
-        eor isr_toggle_reg, rgb_tgl_reg;
-        out RGB_PORTx, isr_toggle_reg;
+	;in  isr_toggle_reg, RGB_PORTx;
+        ;eor isr_toggle_reg, rgb_tgl_reg;
+        ;out RGB_PORTx, isr_toggle_reg;
 
 
 	dec pwm_fade_reg; dec the val
@@ -149,13 +163,13 @@ TIM0_OVF:
 	;ldi regA, (1<<PWM_DIR_FLAG);put the dir flag bit in regA
 	;eor my_flags_reg, regA; toggle dir flag bit in my_flags_reg
 	
-	;inc temp_pwm_reg;
-	out OCR0B, temp_pwm_reg; put the value into OCR0B
+	inc temp_pwm_reg;
+	;out OCR0B, temp_pwm_reg; put the value into OCR0B
 
 	;tgl_io_in_reg RGB_PORTx, rgb_tgl_reg;toggle the pins  
-	;in  isr_toggle_reg, RGB_PORTx;
-        ;eor isr_toggle_reg, rgb_tgl_reg;
-        ;out RGB_PORTx, isr_toggle_reg;
+	in  isr_toggle_reg, RGB_PORTx;
+        eor isr_toggle_reg, rgb_tgl_reg;
+        out RGB_PORTx, isr_toggle_reg;
 
 	
 	;make temp storage
@@ -202,8 +216,11 @@ END_JUMP_TREE:
 	out RGB_PORTx, rgbport_temp;
 	mov rgb_tgl_reg, tglstr_temp;
 
-	;out OCR0B, temp_pwm_reg;	
+	out OCR0B, temp_pwm_reg;	
 	;out OCR0B, pwm_fade_reg;
+	;in  isr_toggle_reg, RGB_PORTx;
+        ;eor isr_toggle_reg, rgb_tgl_reg;
+        ;out RGB_PORTx, isr_toggle_reg;
 
 
 PWM_NOT_0: ; the branch skips to here 
@@ -211,10 +228,10 @@ PWM_NOT_0: ; the branch skips to here
 	reti;return from interrupt
 
 ;TIM0_COMPB:
-	
-	;tgl_io_in_reg RGB_PORTx, rgb_tgl_reg;toggle the pins 
+;	
+;	;tgl_io_in_reg RGB_PORTx, rgb_tgl_reg;toggle the pins 
 ;	in  isr_toggle_reg, RGB_PORTx;
 ;	eor isr_toggle_reg, rgb_tgl_reg;
 ;	out RGB_PORTx, isr_toggle_reg;
-	;out RGB_PINx, rgb_tgl_reg;
+;	;out RGB_PINx, rgb_tgl_reg;
 ;	reti;return from interrupt
